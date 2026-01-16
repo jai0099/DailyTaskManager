@@ -1,5 +1,6 @@
 package com.example.dailytaskmanager
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //initialize binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -33,6 +35,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.recyclerTasks.layoutManager = LinearLayoutManager(this)
         binding.recyclerTasks.adapter = adapter
+
+        //use binding
+        binding.fabAdd.setOnClickListener {
+            startActivity(Intent(this, AddTaskActivity::class.java))
+        }
 
         loadTasks()
     }
