@@ -1,5 +1,6 @@
 package com.example.dailytaskmanager
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,17 @@ class TaskAdapter(
         holder.tvDate.text =
             SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                 .format(Date(task.dueDate))
+
+        // VISUAL COMPLETED STATE
+        if (task.isCompleted) {
+            holder.cbDone.paintFlags =
+                holder.cbDone.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            holder.cbDone.alpha = 0.5f
+        } else {
+            holder.cbDone.paintFlags =
+                holder.cbDone.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            holder.cbDone.alpha = 1f
+        }
 
         // Checkbox
         holder.cbDone.setOnCheckedChangeListener { _, _ ->

@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailytaskmanager.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,7 +20,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize ViewBinding FIRST
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerTasks.layoutManager = LinearLayoutManager(this)
         binding.recyclerTasks.adapter = adapter
 
-        // Add new task
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
         }
@@ -64,16 +63,33 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh list after add/edit
         loadTasks()
     }
 
+    // TODAY FILTER LOGIC
     private fun loadTasks() {
         lifecycleScope.launch {
-            val list = db.taskDao().getAllTasks()
+
+            val cal = Calendar.getInstance()
+
+            // Start of today
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            val startOfDay = cal.timeInMillis
+
+            // End of today
+            cal.set(Calendar.HOUR_OF_DAY, 23)
+            cal.set(Calendar.MINUTE, 59)
+            cal.set(Calendar.SECOND, 59)
+            cal.set(Calendar.MILLISECOND, 999)
+            val endOfDay = cal.timeInMillis
+
+            val list = db.taskDao().getTodayTasks(startOfDay, endOfDay)
 
             adapter.submitList(list)
-            binding.tvCount.text = "Total Tasks: ${list.size}"
+            binding.tvCount.text = "Today Tasks: ${list.size}"
             binding.tvEmpty.visibility =
                 if (list.isEmpty()) View.VISIBLE else View.GONE
         }
