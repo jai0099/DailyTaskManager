@@ -13,7 +13,9 @@ class AddTaskActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTaskBinding
     private lateinit var db: TaskDatabase
+
     private var selectedDate: Long = 0L
+    private var taskId: Int = -1   // for Edit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +24,15 @@ class AddTaskActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         db = TaskDatabase.getDatabase(this)
+
+        // Check if Edit mode
+        taskId = intent.getIntExtra("task_id", -1)
+        if (taskId != -1) {
+            binding.etTitle.setText(intent.getStringExtra("task_title"))
+            selectedDate = intent.getLongExtra("task_date", 0L)
+            binding.tvDate.text = Date(selectedDate).toString()
+            binding.btnSave.text = "Update Task"
+        }
 
         binding.btnDate.setOnClickListener {
             openDatePicker()
@@ -62,12 +73,25 @@ class AddTaskActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            db.taskDao().insertTask(
-                TaskEntity(
-                    title = title,
-                    dueDate = selectedDate
+            if (taskId == -1) {
+                // ADD TASK
+                db.taskDao().insertTask(
+                    TaskEntity(
+                        title = title,
+                        dueDate = selectedDate
+                    )
                 )
-            )
+            } else {
+                // UPDATE TASK
+                db.taskDao().updateTask(
+                    TaskEntity(
+                        id = taskId,
+                        title = title,
+                        dueDate = selectedDate,
+                        isCompleted = false
+                    )
+                )
+            }
             finish()
         }
     }

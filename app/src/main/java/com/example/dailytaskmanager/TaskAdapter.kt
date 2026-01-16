@@ -10,7 +10,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TaskAdapter(
-    private val onChecked: (TaskEntity) -> Unit
+    private val onChecked: (TaskEntity) -> Unit,
+    private val onLongPress: (TaskEntity) -> Unit,
+    private val onClick: (TaskEntity) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     private var list = listOf<TaskEntity>()
@@ -45,9 +47,20 @@ class TaskAdapter(
             SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                 .format(Date(task.dueDate))
 
+        // Checkbox
         holder.cbDone.setOnCheckedChangeListener { _, _ ->
             onChecked(task)
         }
-    }
 
+        // Long press delete
+        holder.itemView.setOnLongClickListener {
+            onLongPress(task)
+            true
+        }
+
+        // Single tap edit
+        holder.itemView.setOnClickListener {
+            onClick(task)
+        }
+    }
 }
