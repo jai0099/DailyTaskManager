@@ -1,22 +1,43 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardTask"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="10dp"
+    app:cardBackgroundColor="@color/ad_white"
+    app:cardUseCompatPadding="true">
 
-    <CheckBox
-        android:id="@+id/cbDone"
-        android:text="Task title"
-        android:textStyle="bold"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvDate"
-        android:text="Due date"
-        android:textSize="12sp"
-        android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <!-- Task Title -->
+        <CheckBox
+            android:id="@+id/cbDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Task title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/ad_dark_gray"
+            android:buttonTint="@color/ad_dark_gray"/>
 
-</LinearLayout>
+        <!-- Due Date -->
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:paddingStart="7dp"
+            android:text="Due date"
+            android:textSize="13sp"
+            android:textColor="@color/ad_gray"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

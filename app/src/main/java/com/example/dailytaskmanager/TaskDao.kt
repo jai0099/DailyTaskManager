@@ -18,11 +18,6 @@ interface TaskDao {
     @Delete
     suspend fun deleteTask(task: TaskEntity)
 
-    // (sorted + completed bottom)
-    @Query("""
-        SELECT * FROM tasks
-        WHERE dueDate BETWEEN :start AND :end
-        ORDER BY isCompleted ASC, dueDate ASC
-    """)
-    suspend fun getTodayTasks(start: Long, end: Long): List<TaskEntity>
+    @Query("SELECT * FROM tasks ORDER BY isCompleted ASC, dueDate ASC")
+    suspend fun getAllTasks(): List<TaskEntity>
 }

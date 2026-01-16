@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailytaskmanager.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         db = TaskDatabase.getDatabase(this)
 
         adapter = TaskAdapter(
-            // Checkbox complete / incomplete
+            // Checkbox -> mark complete / incomplete
             onChecked = { task ->
                 lifecycleScope.launch {
                     db.taskDao().updateTask(
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 showDeleteDialog(task)
             },
 
-            // Single tap -> edit
+            // Single tap -> edit task
             onClick = { task ->
                 val intent = Intent(this, AddTaskActivity::class.java)
                 intent.putExtra("task_id", task.id)
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerTasks.layoutManager = LinearLayoutManager(this)
         binding.recyclerTasks.adapter = adapter
 
+        // Add new task
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, AddTaskActivity::class.java))
         }
@@ -66,30 +66,13 @@ class MainActivity : AppCompatActivity() {
         loadTasks()
     }
 
-    // TODAY FILTER LOGIC
+    // LOAD ALL TASKS (sorted by due date, completed at bottom)
     private fun loadTasks() {
         lifecycleScope.launch {
-
-            val cal = Calendar.getInstance()
-
-            // Start of today
-            cal.set(Calendar.HOUR_OF_DAY, 0)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
-            cal.set(Calendar.MILLISECOND, 0)
-            val startOfDay = cal.timeInMillis
-
-            // End of today
-            cal.set(Calendar.HOUR_OF_DAY, 23)
-            cal.set(Calendar.MINUTE, 59)
-            cal.set(Calendar.SECOND, 59)
-            cal.set(Calendar.MILLISECOND, 999)
-            val endOfDay = cal.timeInMillis
-
-            val list = db.taskDao().getTodayTasks(startOfDay, endOfDay)
+            val list = db.taskDao().getAllTasks()
 
             adapter.submitList(list)
-            binding.tvCount.text = "Today Tasks: ${list.size}"
+            binding.tvCount.text = "Total Tasks: ${list.size}"
             binding.tvEmpty.visibility =
                 if (list.isEmpty()) View.VISIBLE else View.GONE
         }

@@ -1,12 +1,15 @@
 package com.example.dailytaskmanager
 
 import android.graphics.Paint
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,6 +27,7 @@ class TaskAdapter(
     }
 
     inner class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val card: MaterialCardView = view.findViewById(R.id.cardTask)
         val cbDone: CheckBox = view.findViewById(R.id.cbDone)
         val tvDate: TextView = view.findViewById(R.id.tvDate)
     }
@@ -36,6 +40,7 @@ class TaskAdapter(
 
     override fun getItemCount(): Int = list.size
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = list[position]
 
@@ -48,30 +53,42 @@ class TaskAdapter(
             SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                 .format(Date(task.dueDate))
 
-        // VISUAL COMPLETED STATE
         if (task.isCompleted) {
             holder.cbDone.paintFlags =
                 holder.cbDone.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            holder.cbDone.alpha = 0.5f
+            holder.cbDone.setTextColor(
+                holder.itemView.context.getColor(R.color.ad_gray)
+            )
+            holder.tvDate.setTextColor(
+                holder.itemView.context.getColor(R.color.ad_gray)
+            )
+            holder.card.alpha = 0.6f
         } else {
             holder.cbDone.paintFlags =
                 holder.cbDone.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-            holder.cbDone.alpha = 1f
+            holder.cbDone.setTextColor(
+                holder.itemView.context.getColor(R.color.ad_dark_gray)
+            )
+            holder.tvDate.setTextColor(
+                holder.itemView.context.getColor(R.color.ad_gray)
+            )
+            holder.card.alpha = 1f
         }
 
-        // Checkbox
+
+        // Checkbox toggle
         holder.cbDone.setOnCheckedChangeListener { _, _ ->
             onChecked(task)
         }
 
-        // Long press delete
-        holder.itemView.setOnLongClickListener {
+        // LONG PRESS ANYWHERE ON CARD = DELETE
+        holder.card.setOnLongClickListener {
             onLongPress(task)
             true
         }
 
-        // Single tap edit
-        holder.itemView.setOnClickListener {
+        // Single tap = edit
+        holder.card.setOnClickListener {
             onClick(task)
         }
     }
