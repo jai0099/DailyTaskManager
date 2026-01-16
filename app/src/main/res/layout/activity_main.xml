@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/tvEmpty"
-            android:text="No tasks for today"
+            android:text="@string/no_tasks"
             android:visibility="gone"
             android:layout_marginTop="24dp"
             android:layout_width="wrap_content"

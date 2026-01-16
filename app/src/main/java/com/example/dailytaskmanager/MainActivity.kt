@@ -98,8 +98,8 @@ class MainActivity : AppCompatActivity() {
     // Delete confirmation dialog
     private fun showDeleteDialog(task: TaskEntity) {
         AlertDialog.Builder(this)
-            .setTitle("Delete Task")
-            .setMessage("Are you sure you want to delete this task?")
+            .setTitle(getString(R.string.delete_task))
+            .setMessage(getString(R.string.delete_confirm))
             .setPositiveButton("Delete") { _, _ ->
                 lifecycleScope.launch {
                     db.taskDao().deleteTask(task)
