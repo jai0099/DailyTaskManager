@@ -1,46 +1,50 @@
 package com.example.dailytaskmanager
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.dailytaskmanager.ui.theme.DailyTaskManagerTheme
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dailytaskmanager.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: TaskAdapter
+    private lateinit var db: TaskDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            DailyTaskManagerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        db = TaskDatabase.getDatabase(this)
+
+        adapter = TaskAdapter { task ->
+            lifecycleScope.launch {
+                db.taskDao().updateTask(
+                    task.copy(isCompleted = !task.isCompleted)
+                )
+                loadTasks()
             }
         }
+
+        binding.recyclerTasks.layoutManager = LinearLayoutManager(this)
+        binding.recyclerTasks.adapter = adapter
+
+        loadTasks()
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun loadTasks() {
+        lifecycleScope.launch {
+            val list = db.taskDao().getAllTasks()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DailyTaskManagerTheme {
-        Greeting("Android")
+            adapter.submitList(list)
+            binding.tvCount.text = "Total Tasks: ${list.size}"
+            binding.tvEmpty.visibility =
+                if (list.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 }
